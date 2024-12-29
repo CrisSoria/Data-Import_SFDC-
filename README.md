@@ -1,11 +1,11 @@
-# Salesforce Data Import Wizard
+# Salesforce Custom Data Import
 
 Componente Lightning Web personalizado (LWC) que proporciona una interfaz intuitiva para importar datos CSV a objetos de Salesforce, con validación dinámica y mapeo de campos flexible.
 
 
 ## 🚀 Características
 
-<img align="right" alt="Cargar CSV" src="./assets/carga.png" width="40%" />
+<img align="right" alt="Cargar CSV" src="./assets/carga.png" width="60%" />
 
 - Interfaz de usuario moderna e intuitiva usando Lightning Design System (SLDS)
 - Carga y validación de archivos CSV
@@ -18,7 +18,7 @@ Componente Lightning Web personalizado (LWC) que proporciona una interfaz intuit
 
 ## 🛠️ Tecnologías Utilizadas
 
-<img align="right" alt="Cargar CSV" src="./assets/1mapeo.png" width="40%" />
+<img align="right" alt="Cargar CSV" src="./assets/1mapeo.png" width="60%" />
 
 - **Lightning Web Components (LWC)**
   - Componentes web nativos
@@ -39,7 +39,7 @@ Componente Lightning Web personalizado (LWC) que proporciona una interfaz intuit
 
 ### Seguridad y Validación
 
-<img align="right" alt="Cargar CSV" src="./assets/2obj.png" width="40%" />
+<img align="right" alt="Cargar CSV" src="./assets/2obj.png" width="60%" />
 
 - Verificación de permisos CRUD a nivel de objeto
 - Validación de accesibilidad de campos
@@ -48,14 +48,15 @@ Componente Lightning Web personalizado (LWC) que proporciona una interfaz intuit
 
 ### Procesamiento de Datos
 
-<img align="right" alt="Cargar CSV" src="./assets/3mapeocampo.png" width="40%" />
-
 - Parseo inteligente de CSV con soporte para campos entre comillas
 - Conversión automática de tipos de datos
 - Procesamiento por lotes para grandes volúmenes
 - Mapeo dinámico de campos
 
 ### Interfaz de Usuario
+
+<img align="right" alt="Cargar CSV" src="./assets/3mapeocampo.png" width="60%" />
+
 - Indicador de progreso por pasos
 - Feedback visual de mapeo de campos
 - Mensajes de error contextuales
@@ -63,15 +64,16 @@ Componente Lightning Web personalizado (LWC) que proporciona una interfaz intuit
 
 ## 🔍 Conocimientos Demostrados
 
-<img align="right" alt="Cargar CSV" src="./assets/fin.png" width="40%" />
-
-
 1. **Desarrollo Apex Avanzado**
    - Uso de Schema Describe para metadatos
    - Implementación de patrones de diseño
    - Manejo eficiente de colecciones
    - Optimización de consultas SOQL
    - Procesamiento de datos en lote
+   
+<img align="right" alt="Cargar CSV" src="./assets/fin.png" width="60%" />
+
+
 
 2. **Desarrollo LWC**
    - Arquitectura basada en componentes

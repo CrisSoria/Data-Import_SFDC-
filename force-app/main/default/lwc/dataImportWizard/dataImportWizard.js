@@ -11,15 +11,52 @@ export default class DataImportWizard extends LightningElement {
   @track fieldList = [];
   @track columnHeaders = [];
   @track selectedObject;
-  @track objectFields = [];
   @track error;
   @track isLoading = false;
   @track csvData;
-  fieldMapping = {};
+  @track currentStep = 'upload'; // Posibles valores: 'upload', 'mapping', 'import'
+  @track fieldMapping = {};
+
+  // Computed properties
+  get mappedFieldsCount() {
+    return Object.keys(this.fieldMapping).length;
+  }
+
+  get isImportDisabled() {
+    return !this.selectedObject ||
+      !this.csvData ||
+      this.mappedFieldsCount === 0 ||
+      this.isLoading;
+  }
+
+  // Getter para la lista de campos con su estado de mapeo
+  get fieldListWithStatus() {
+    return this.fieldList.map(field => {
+      const mappedValue = this.fieldMapping[field.apiName] || '';
+      const isMapped = Boolean(mappedValue);
+      return {
+        ...field,
+        mappedValue,
+        isMapped,
+        cssClass: `field-mapping-item ${isMapped ? 'slds-has-success' : ''}`
+      };
+    });
+  }
+  getFieldMappingClass(apiName) {
+    const baseClasses = 'field-mapping-item';
+    return this.fieldMapping[apiName]
+      ? `${baseClasses} slds-has-success`
+      : baseClasses;
+  }
+
+  getFieldMappingValue(apiName) {
+    return this.fieldMapping[apiName] || '';
+  }
 
   handleUploadFinished(event) {
     const contentDocumentId = event.detail.files[0].documentId;
     this.readFile(contentDocumentId);
+    this.updatePathStatus('mapping');
   }
 
   async readFile(Id) {
@@ -86,29 +123,39 @@ export default class DataImportWizard extends LightningElement {
   handleColumnSelection(event) {
     const selectedColumn = event.detail.value;
     const fieldApiName = event.target.dataset.apiname;
-    this.fieldMapping[selectedColumn] = fieldApiName;
+
+    if (selectedColumn) {
+      this.fieldMapping = {
+        ...this.fieldMapping,
+        [fieldApiName]: selectedColumn
+      };
+    } else {
+      const newMapping = { ...this.fieldMapping };
+      delete newMapping[fieldApiName];
+      this.fieldMapping = newMapping;
+    }
+
+    console.log('Field Mapping Updated:', this.fieldMapping);
+    console.log('Mapped Fields Count:', this.mappedFieldsCount);
   }
 
+
   handleImportData() {
-    if (!this.selectedObject || !this.csvData || Object.keys(this.fieldMapping).length === 0) {
+    if (this.isImportDisabled) {
       this.error = 'Por favor complete el mapeo de campos antes de importar';
       return;
     }
 
     this.isLoading = true;
-
-    // Logging para diagnóstico
     console.log('Selected Object:', this.selectedObject);
     console.log('CSV Data:', this.csvData);
     console.log('Field Mapping:', this.fieldMapping);
 
     // Invertir el mapping para que sea header:fieldApiName
     const invertedMapping = {};
-    Object.entries(this.fieldMapping).forEach(([column, field]) => {
+    Object.entries(this.fieldMapping).forEach(([field, column]) => {
       invertedMapping[column] = field;
     });
-
-    console.log('Inverted Mapping:', invertedMapping);
 
     // Preparar los datos para la importación
     const importParams = {
@@ -116,24 +163,18 @@ export default class DataImportWizard extends LightningElement {
       lines: this.csvData.lines
     };
 
-    console.log('Import Params:', importParams);
-
-    // Llamar al método de Apex para procesar la importación
     processDataImport({
       csvData: JSON.stringify(importParams),
       objectName: this.selectedObject,
       fieldMapping: invertedMapping
     })
       .then(result => {
-        // Mostrar mensaje de éxito
         const evt = new ShowToastEvent({
           title: 'Éxito',
           message: result,
           variant: 'success'
         });
         this.dispatchEvent(evt);
-
-        // Limpiar el formulario
         this.resetForm();
       })
       .catch(error => {
@@ -147,11 +188,13 @@ export default class DataImportWizard extends LightningElement {
 
   resetForm() {
     this.csvData = null;
-    this.fieldMapping = {};
+    this.fieldMapping = {};  // Reseteamos con un nuevo objeto vacío
     this.selectedObject = null;
     this.fieldList = [];
     this.columnHeaders = [];
     this.error = null;
+    this.currentStep = 'upload';
+    this.updatePathStatus('upload');
 
     // Limpiar los componentes del formulario
     const fileUpload = this.template.querySelector('lightning-file-upload');
@@ -163,6 +206,22 @@ export default class DataImportWizard extends LightningElement {
     if (objectCombobox) {
       objectCombobox.value = null;
     }
+  }
+
+  updatePathStatus(step) {
+    const steps = ['upload', 'mapping', 'import'];
+    const pathItems = this.template.querySelectorAll('.slds-path__item');
+
+    steps.forEach((stepName, index) => {
+      if (pathItems[index]) {
+        pathItems[index].classList.remove('slds-is-active', 'slds-is-complete');
+        if (stepName === step) {
+          pathItems[index].classList.add('slds-is-active');
+        } else if (steps.indexOf(stepName) < steps.indexOf(step)) {
+          pathItems[index].classList.add('slds-is-complete');
+        }
+      }
+    });
   }
 
 }

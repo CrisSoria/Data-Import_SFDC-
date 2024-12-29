@@ -1,0 +1,53 @@
+/* dataImportWizard.css */
+.upload-zone {
+  min-height: 150px;
+  border: 2px dashed #d8dde6;
+  border-radius: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+  border-color: #1589ee;
+  background-color: #fafaf9;
+}
+
+.field-mapping-item {
+  background: #ffffff;
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  border: 1px solid #d8dde6;
+  transition: all 0.2s ease;
+}
+
+
+.field-mapping-item.slds-has-success {
+  border-color: #4bca81;
+  background-color: #f3fcf5;
+}
+
+
+.object-selector {
+  max-width: 100%;
+}
+
+/* Eliminar el padding extra del lightning-file-upload */
+:host {
+  --sds-c-file-height: auto;
+}
+
+/* Estilo para el path cuando está completo */
+.slds-path__item.slds-is-complete .slds-path__link {
+  background-color: #4bca81;
+}
+
+/* Estilo para el path cuando está activo */
+.slds-path__item.slds-is-active .slds-path__link {
+  background-color: #1589ee;
+}
+
+/* Ajustes responsive */
+@media (max-width: 48em) {
+  .slds-col.slds-size_1-of-2 {
+    width: 100%;
+  }
+}

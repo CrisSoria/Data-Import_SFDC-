@@ -1,56 +1,172 @@
+<!-- dataImportWizard.html -->
 <template>
-  <lightning-card variant="Narrow" title="Asistente para importación de datos" icon-name="standard:data_transforms">
-    <!-- Upload File -->
-    <div class="fileUpload">
-      <lightning-file-upload label="Cargar archivo CSV con los datos" name="fileUploader" accept={acceptedFormats}
-        onuploadfinished={handleUploadFinished}>
-      </lightning-file-upload>
-    </div>
-
-    <!-- Select sObject -->
-    <div class="selectionObject">
-      <lightning-combobox name="objectselected" label="Seleccione el objeto donde guardar los datos"
-        placeholder="Seleccione un objeto" value={selectedObject} options={salesforceObjects}
-        onchange={handleObjectSelection}></lightning-combobox>
-    </div>
-    <!-- Mostrar spinner mientras carga -->
-    <template if:true={isLoading}>
-      <lightning-spinner alternative-text="Cargando" size="small"></lightning-spinner>
-    </template>
-
-    <!-- Mostrar error si existe -->
-    <template if:true={error}>
-      <div class="slds-p-top_small">
-        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
-          {error}
-        </div>
+  <div class="slds-card">
+      <!-- Header -->
+      <div class="slds-card__header slds-grid">
+          <header class="slds-media slds-media_center slds-has-flexi-truncate">
+              <div class="slds-media__figure">
+                  <lightning-icon icon-name="utility:import_updates" size="medium"></lightning-icon>
+              </div>
+              <div class="slds-media__body">
+                  <h2 class="slds-card__header-title">
+                      <span class="slds-text-heading_medium">Asistente de Importación</span>
+                  </h2>
+                  <p class="slds-text-body_small slds-text-color_weak">
+                      Importa tus datos de forma rápida y sencilla
+                  </p>
+              </div>
+          </header>
       </div>
-    </template>
-    <!-- Mapping de Campos del objeto con columnas del CSV -->
-    <div class="mapping">
-      <template for:each={fieldList} for:item="field">
-        <div key={field.apiName}>
-          <div>
-            {field.label}
-          </div>
-          <div>
-            <lightning-combobox name="columselected" placeholder="Seleccione una columna" options={columnHeaders}
-              onchange={handleColumnSelection} data-apiname={field.apiName}></lightning-combobox>
-          </div>
-        </div>
-      </template>
-    </div>
 
-    <hr>
-    <template if:true={csvData}>
-      <div class="slds-p-around_medium">
-        <div class="slds-text-heading_small">
-          Filas encontradas: {csvData.totalRows}
-        </div>
+      <div class="slds-card__body slds-card__body_inner">
+          <!-- Progress Indicator -->
+          <div class="slds-path">
+              <div class="slds-grid slds-path__track">
+                  <div class="slds-grid slds-path__scroller-container">
+                      <div class="slds-path__scroller">
+                          <div class="slds-path__scroller_inner">
+                              <ul class="slds-path__nav" role="listbox">
+                                  <li class="slds-path__item slds-is-active" role="presentation">
+                                      <a class="slds-path__link" role="option">
+                                          <span class="slds-path__stage">
+                                              <lightning-icon icon-name="utility:check" size="x-small"></lightning-icon>
+                                          </span>
+                                          <span class="slds-path__title">Cargar Archivo</span>
+                                      </a>
+                                  </li>
+                                  <li class="slds-path__item" role="presentation">
+                                      <a class="slds-path__link" role="option">
+                                          <span class="slds-path__stage">
+                                              <lightning-icon icon-name="utility:check" size="x-small"></lightning-icon>
+                                          </span>
+                                          <span class="slds-path__title">Mapear Campos</span>
+                                      </a>
+                                  </li>
+                                  <li class="slds-path__item" role="presentation">
+                                      <a class="slds-path__link" role="option">
+                                          <span class="slds-path__stage">
+                                              <lightning-icon icon-name="utility:check" size="x-small"></lightning-icon>
+                                          </span>
+                                          <span class="slds-path__title">Importar</span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- File Upload Section -->
+          <div class="slds-p-around_medium">
+              <div class="slds-box slds-box_xx-small slds-theme_shade upload-zone">
+                  <div class="slds-text-align_center">
+                      <lightning-file-upload
+                          label="Arrastra tu archivo CSV aquí o haz clic para seleccionar"
+                          name="fileUploader"
+                          accept={acceptedFormats}
+                          onuploadfinished={handleUploadFinished}>
+                      </lightning-file-upload>
+                      <p class="slds-text-body_small slds-text-color_weak slds-p-top_x-small">
+                          Formatos soportados: CSV
+                      </p>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Object Selection -->
+          <div class="slds-p-around_medium">
+              <lightning-combobox
+                  name="objectselected"
+                  label="Objeto de Salesforce"
+                  placeholder="Selecciona el objeto donde importar los datos"
+                  value={selectedObject}
+                  options={salesforceObjects}
+                  onchange={handleObjectSelection}
+                  class="object-selector">
+              </lightning-combobox>
+          </div>
+
+          <!-- Loading Spinner -->
+          <template if:true={isLoading}>
+              <div class="slds-is-relative slds-p-around_medium">
+                  <lightning-spinner alternative-text="Cargando" size="small"></lightning-spinner>
+              </div>
+          </template>
+
+          <!-- Error Message -->
+          <template if:true={error}>
+              <div class="slds-p-around_medium">
+                  <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                      <lightning-icon icon-name="utility:error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                      <h2>{error}</h2>
+                  </div>
+              </div>
+          </template>
+
+          <!-- Field Mapping Section -->
+          <template if:true={fieldList}>
+            <div class="slds-box slds-theme_shade slds-m-around_medium">
+                <h3 class="slds-text-heading_small slds-p-bottom_small">Mapeo de Campos</h3>
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <template for:each={fieldListWithStatus} for:item="field">
+                        <div key={field.apiName} class="slds-col slds-size_1-of-2 slds-p-bottom_small">
+                            <div class={field.cssClass}>
+                                <label class="slds-form-element__label">{field.label}</label>
+                                <lightning-combobox
+                                    name="columselected"
+                                    placeholder="Seleccione una columna"
+                                    options={columnHeaders}
+                                    value={field.mappedValue}
+                                    onchange={handleColumnSelection}
+                                    data-apiname={field.apiName}>
+                                </lightning-combobox>
+                                <template if:true={field.isMapped}>
+                                    <div class="slds-form-element__help slds-text-color_success">
+                                        <lightning-icon icon-name="utility:success" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                        Campo mapeado
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+          <!-- Summary Section -->
+          <template if:true={csvData}>
+              <div class="slds-box slds-box_small slds-theme_info slds-m-around_medium">
+                  <div class="slds-grid slds-grid_align-spread">
+                      <div class="slds-text-body_small">
+                          Filas encontradas: {csvData.totalRows}
+                      </div>
+                      <div class="slds-text-body_small">
+                          Campos mapeados: {mappedFieldsCount}
+                      </div>
+                  </div>
+              </div>
+          </template>
       </div>
-    </template>
-    <!-- Importar la data -->
-    <lightning-button variant="brand" label="Importar Datos" title="Importar Datos" onclick={handleImportData}
-      class="slds-m-left_x-small"></lightning-button>
-  </lightning-card>
+
+      <!-- Footer -->
+      <footer class="slds-card__footer">
+          <div class="slds-grid slds-grid_align-end">
+              <lightning-button 
+                  variant="neutral" 
+                  label="Cancelar" 
+                  title="Cancelar" 
+                  onclick={resetForm} 
+                  class="slds-m-right_x-small">
+              </lightning-button>
+              <lightning-button 
+                  variant="brand" 
+                  label="Importar Datos" 
+                  title="Importar Datos" 
+                  onclick={handleImportData}
+                  disabled={isImportDisabled}>
+              </lightning-button>
+          </div>
+      </footer>
+  </div>
 </template>
